@@ -1,24 +1,24 @@
 #pragma once
 
-//Éè±¸ÖÖÀà
+//è®¾å¤‡ç§ç±»
 typedef enum EquipmentType
 {
-	MEC,	//»úĞµÀà
-	CHM,	//»¯Ñ§Àà
-	MDC,	//Ò½Ñ§Àà
-	ELC,	//µç×ÓÀà
-	SPC		//ÌØÊâÉè±¸
+	MEC,	//æœºæ¢°ç±»
+	CHM,	//åŒ–å­¦ç±»
+	MDC,	//åŒ»å­¦ç±»
+	ELC,	//ç”µå­ç±»
+	SPC		//ç‰¹æ®Šç±»
 }EquipType;
 
 
-//Éè±¸½á¹¹Ìå
+//è®¾å¤‡ç»“æ„ä½“
 typedef struct Equipment
 {
-	EquipType	type;//Éè±¸ÖÖÀà
-	char*		name;//Éè±¸Ãû³Æ
-	char*		id;//Éè±¸±àºÅ
-	long long	buy_date;//¹ºÈëÈÕÆÚ
-	long long	scrap_date;//±¨·ÏÈÕÆÚ
-	double		price;//¹ºÈë¼Û¸ñ
-	bool		flag;//±¨·Ï±êÖ¾
+	EquipType	type;//è®¾å¤‡ç§ç±»
+	char*		name;//è®¾å¤‡åç§°
+	char*		id;//è®¾å¤‡ç¼–å·
+	long long	buy_date;//è´­å…¥æ—¥æœŸ
+	long long	scrap_date;//ä¿è´¹æ—¥æœŸ
+	double		price;//è´­å…¥ä»·æ ¼
+	bool		flag;//ä¿è´¹æ ‡å¿—
 }Equip;
