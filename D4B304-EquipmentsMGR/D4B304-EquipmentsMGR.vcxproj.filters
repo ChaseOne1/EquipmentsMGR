@@ -2,10 +2,15 @@
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
     <ClCompile Include="Main.c" />
+    <ClCompile Include="EquipMgr\EquipMgr.c" />
+    <ClCompile Include="EquipMgr\FileMgr.c" />
+    <ClCompile Include="UserInterface\UserInerface.c" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Main.h" />
     <ClInclude Include="EquipMgr\Equipment.h" />
     <ClInclude Include="UserInterface\UserInterface.h" />
+    <ClInclude Include="EquipMgr\EquipMgr.h" />
+    <ClInclude Include="EquipMgr\FileMgr.h" />
   </ItemGroup>
 </Project>

@@ -139,10 +139,15 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="EquipMgr\EquipMgr.c" />
+    <ClCompile Include="EquipMgr\FileMgr.c" />
     <ClCompile Include="Main.c" />
+    <ClCompile Include="UserInterface\UserInerface.c" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="EquipMgr\Equipment.h" />
+    <ClInclude Include="EquipMgr\EquipMgr.h" />
+    <ClInclude Include="EquipMgr\FileMgr.h" />
     <ClInclude Include="Main.h" />
     <ClInclude Include="UserInterface\UserInterface.h" />
   </ItemGroup>
