@@ -151,6 +151,9 @@
     <ClInclude Include="Main.h" />
     <ClInclude Include="UserInterface\UserInterface.h" />
   </ItemGroup>
+  <ItemGroup>
+    <None Include="EquipmentsMGR.dev" />
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>

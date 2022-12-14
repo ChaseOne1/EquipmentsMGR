@@ -13,4 +13,7 @@
     <ClInclude Include="EquipMgr\EquipMgr.h" />
     <ClInclude Include="EquipMgr\FileMgr.h" />
   </ItemGroup>
+  <ItemGroup>
+    <None Include="EquipmentsMGR.dev" />
+  </ItemGroup>
 </Project>
