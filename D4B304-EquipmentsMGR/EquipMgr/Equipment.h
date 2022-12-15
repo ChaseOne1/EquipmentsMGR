@@ -1,4 +1,4 @@
-﻿#pragma once
+#pragma once
 
 //设备种类
 typedef enum EquipmentType
