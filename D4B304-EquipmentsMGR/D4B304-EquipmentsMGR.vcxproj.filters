@@ -5,7 +5,6 @@
     <ClCompile Include="EquipMgr\EquipMgr.c" />
     <ClCompile Include="EquipMgr\FileMgr.c" />
     <ClCompile Include="UserInterface\UserInerface.c" />
-    <ClCompile Include="EquipMgr\List.c" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Main.h" />
@@ -13,7 +12,6 @@
     <ClInclude Include="UserInterface\UserInterface.h" />
     <ClInclude Include="EquipMgr\EquipMgr.h" />
     <ClInclude Include="EquipMgr\FileMgr.h" />
-    <ClInclude Include="EquipMgr\List.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="EquipmentsMGR.dev" />
