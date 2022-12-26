@@ -1,4 +1,5 @@
 #pragma once
+#include <stdbool.h>
 
 //设备种类
 typedef enum EquipmentType
@@ -7,14 +8,15 @@ typedef enum EquipmentType
 	CHM,	//化学类
 	MDC,	//医学类
 	ELC,	//电子类
-	SPC		//特殊类
-}EquipType;
+	SPC,	//特殊类
+	TOTAL	//总类数
+}eEquipType;
 
 
 //设备结构体
 typedef struct Equipment
 {
-	EquipType	type;//设备种类
+	eEquipType	type;//设备种类
 	char* name;//设备名称
 	char* id;//设备编号
 	long long	buy_date;//购入日期
