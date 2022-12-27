@@ -33,7 +33,7 @@ void System_Destory();
 
 int main()
 {
-	SetConsoleOutputCP(65001);
+	SetConsoleOutputCP(65001);//修改控制台的编码格式为utf-8
 	System_Initialize();
 	while (true)
 	{
