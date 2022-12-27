@@ -10,28 +10,33 @@ void AddEquip(Equip* equip[], Equip* equipment)
 
 }
 
-unsigned char* TypeCount(Equip* equip[], int EquipNum)
+unsigned char* TypeCount(LinkList* list)
 {
-	unsigned char* TYPE = (unsigned char*)malloc(sizeof(unsigned char) * TOTAL * 2);
-	if (!TYPE)
-		return NULL;
-	memset(TYPE, 0, sizeof(unsigned char) * 10);
-	for (int i = 0; i < EquipNum; ++i)
+	Node* curr = list->head;
+	unsigned char* TYPE = (unsigned char*)calloc(TOTAL * 2 + 2, sizeof(unsigned char));
+	assert(TYPE);
+	while (curr)
 	{
-		switch (equip[i]->type)
+		switch (curr->pEquip->type)
 		{
-		case MEC:	++TYPE[MEC];	
-			if (equip[i]->flag) ++TYPE[MEC + TOTAL];	break;
+		case MEC:	++TYPE[MEC];
+			if (curr->pEquip->flag) ++TYPE[MEC + TOTAL + 1];	break;
 		case CHM:	++TYPE[CHM];
-			if (equip[i]->flag) ++TYPE[CHM + TOTAL];	break;
+			if (curr->pEquip->flag) ++TYPE[CHM + TOTAL + 1];	break;
 		case MDC:	++TYPE[MDC];
-			if (equip[i]->flag) ++TYPE[MDC + TOTAL];	break;
+			if (curr->pEquip->flag) ++TYPE[MDC + TOTAL + 1];	break;
 		case ELC:	++TYPE[ELC];
-			if (equip[i]->flag) ++TYPE[ELC + TOTAL];	break;
+			if (curr->pEquip->flag) ++TYPE[ELC + TOTAL + 1];	break;
 		case SPC:	++TYPE[SPC];
-			if (equip[i]->flag) ++TYPE[SPC + TOTAL];	break;
+			if (curr->pEquip->flag) ++TYPE[SPC + TOTAL + 1];	break;
 		default:	break;
 		}
+		curr = curr->next;
+	}
+	for (int i = 0; i < TOTAL; ++i)
+	{
+		TYPE[TOTAL] += TYPE[i];
+		TYPE[TOTAL + TOTAL + 1] += TYPE[TOTAL + i + 1];
 	}
 	return TYPE;
 }
