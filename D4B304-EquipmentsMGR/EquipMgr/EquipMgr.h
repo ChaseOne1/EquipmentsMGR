@@ -2,6 +2,6 @@
 
 void InputInfo();
 
-unsigned char* TypeCount(Equip* equip[], int EquipNum);
+unsigned char* TypeCount(LinkList* list);
 
 void Date_sort(Equip* equip[]);
