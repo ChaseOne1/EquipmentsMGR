@@ -1,10 +1,9 @@
 #include "..\Main.h"
-#include <string.h>
 #include "UserInterface.h"
 #include "..\EquipMgr\EquipMgr.h"
 
 extern const char* cEquipType[TOTAL + 1];
-extern Equip* equip[5];
+extern LinkList equipList;
 
 void SetupUI()
 {
@@ -29,8 +28,8 @@ void MainMenuDisplay()
 
 bool SystemControl(char ctrl)
 {
-	system("cls");
-	char ch;	getchar();
+	system("cls");	
+	if (ctrl != '\n')	getchar();
 	switch (ctrl)
 	{
 	case '1':
@@ -47,12 +46,14 @@ bool SystemControl(char ctrl)
 	case '6':
 		break;
 	case '0':
-		printf("确认退出？(Y/N)\n");
-		ch = getchar();
+		printf("确认退出？(Y/N)\n> ");
+		char ch = getchar();	getchar();
 		if (ch == 'Y' || ch == 'y')
 			return true;
 		else
 			break;
+	default:
+		break;
 	}
 	return false;
 }
@@ -62,12 +63,13 @@ void Count()
 	system("cls");
 	char type[6];	eEquipType TYPE = -1;
 	const char* cEquipType[TOTAL + 1] = { "MEC","CHM","MDC","ELC","SPC","TOTAL" };
-	unsigned char* result = TypeCount(equip, 5);
+	unsigned char* result = TypeCount(&equipList);
+	printf("请输入欲统计的类别： (机械类:MEC、化学类:CHM、医学类:MDC、电子类:ELC、特殊类:SPC、所有:TOTAL)\n退出请输入N\n");
 	while (true)
 	{
-		printf("请输入欲统计的类别： (机械类:MEC、化学类:CHM、医学类:MDC、电子类:ELC、特殊类:SPC、所有:TOTAL)\n退出请输入N\n> ");
+		printf("> ");
 		gets(type);
-		for (int i = 1; i < TOTAL; ++i)
+		for (int i = 0; i < TOTAL + 1; ++i)
 		{
 			if (!strcmp(type, cEquipType[i]))
 			{
@@ -79,7 +81,7 @@ void Count()
 			break;
 		if (TYPE != -1)
 			printf("%s 设备共有 %d 台（报废 %d 台）\n",
-				cEquipType[TYPE], result[TYPE], result[TYPE + TOTAL]);
+				cEquipType[TYPE], result[TYPE], result[TYPE + TOTAL + 1]);
 		else
 			printf("请重新输入\n");
 	}
