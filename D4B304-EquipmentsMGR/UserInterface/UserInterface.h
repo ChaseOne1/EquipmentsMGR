@@ -6,4 +6,5 @@ void MainMenuDisplay(void);
 
 bool SystemControl(char ctrl);
 
-void Count();
+void Count();//分类统计
+
