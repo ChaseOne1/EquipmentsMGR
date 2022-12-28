@@ -25,7 +25,6 @@ void SortbyID(Equip,int n)//n是输入设备的数量、指输入了几个设备
 
 
 
-
 /*按设备名称查询*/
 void SearchbyName(int n)//n是输入设备的数量、指输入了几个设备
 {
