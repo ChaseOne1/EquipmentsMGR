@@ -112,10 +112,10 @@ void Search()
 	else if(ctrl == '2')
 	{
 		printf("\n请选择报废标志：已报废(Y)/未报废(N)\n> ");
-		char ctrl1 = getchar();
-		if (ctrl != '\n')	getchar();
+		char flag= getchar();
+		if (flag != '\n')	getchar();
 		else return;
-		if (ctrl1 == 'Y' || ctrl1 == 'y')
+		if (flag == 'Y' || flag == 'y')
 		{
 			Node* curr2 = equipList.head;
 			while (curr2)
@@ -125,7 +125,7 @@ void Search()
 				curr2 = curr2->next;
 			}
 		}
-		else if (ctrl1 == 'N' || ctrl1 == 'n')
+		else if (flag == 'N' || flag == 'n')
 		{
 			Node* curr3 = equipList.head;
 			while (curr3)
@@ -192,7 +192,7 @@ void InputInfo()
 		printf("> ");
 		scanf("%s", &type);
 		if(type[0] == 'N' || type[0] == 'n')	break;//录入完毕
-		Equip* equip = (Equip*)malloc(sizeof(equip));
+		Equip* equip = (Equip*)malloc(sizeof(Equip));
 
 		//类型输入
 		equip->type = -1;
@@ -230,6 +230,8 @@ void InputInfo()
 			if (equip->type == -1)
 			{
 				printf("类型输入有误，请重新输入！\n");
+				free(equip->name);
+				free(equip->id);
 				free(equip);
 			}
 
@@ -240,6 +242,10 @@ void InputInfo()
 			}
 		}
 		else if (ctrl == 'N' || ctrl == 'n')
+		{
+			free(equip->name);
+			free(equip->id);
 			free(equip);
+		}
 	} while (true);
 }

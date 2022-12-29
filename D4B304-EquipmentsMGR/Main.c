@@ -77,6 +77,8 @@ void System_Destory()
 	while (curr)
 	{
 		next = curr->next;
+		free(curr->pEquip->name);
+		free(curr->pEquip->id);
 		free(curr->pEquip);
 		free(curr);
 		curr = next;
