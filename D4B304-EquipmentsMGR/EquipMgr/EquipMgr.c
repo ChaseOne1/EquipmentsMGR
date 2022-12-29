@@ -18,6 +18,8 @@ void AddEquip(LinkList* list, Equip* equip)
 	Node* node = ID_Search(list, equip->id);
 	if (node)
 	{
+		free(node->pEquip->name);
+		free(node->pEquip->id);
 		free(node->pEquip);
 		node->pEquip = equip;
 	}
