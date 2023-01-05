@@ -1,13 +1,15 @@
 #pragma once
 
-void AddEquip(LinkList* list, Equip* equip);
+Node* SearchById(LinkList* list, const char* id, long long* No);
+
+bool AddEquip(LinkList* list, const Equip* equip, char mode);
 
 unsigned char* TypeCount(LinkList* list);
 
-void Date_sort(Equip* equip[]);
+void Date_sort(LinkList* list);
 
-LinkList SearchByName(LinkList* list, char* name);
+LinkList SearchByName(LinkList* list, const char* name);
 
 void ScarpEquip(LinkList* list);
 
-bool IsScarp(Equip* equip);
+bool IsScarp(const Equip* equip);

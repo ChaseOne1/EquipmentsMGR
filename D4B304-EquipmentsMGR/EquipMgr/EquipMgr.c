@@ -1,60 +1,79 @@
 #include "..\Main.h"
 #include "EquipMgr.h"
+#include "..\UserInterface\UserInterface.h"
+#include "FileMgr.h"
 
-static Node* ID_Search(LinkList* list, char* id)
+#define INSERT 1
+#define UPDATE 0
+
+Node* SearchById(LinkList* list, const char* id, long long* No)
 {
+	*No = 1;
 	Node* curr = list->head;
 	while (curr)
 	{
 		if (!strcmp(curr->pEquip->id, id))
 			return curr;
 		curr = curr->next;
+		++(*No);
 	}
 	return NULL;
 }
 
-void AddEquip(LinkList* list, Equip* equip)
+bool AddEquip(LinkList* list, const Equip* equip,char mode)
 {
-	Node* node = ID_Search(list, equip->id);
+	long long countLine = 0;
+	Node* node = SearchById(list, equip->id, &countLine);
 	if (node)
 	{
 		free(node->pEquip->name);
 		free(node->pEquip->id);
 		free(node->pEquip);
 		node->pEquip = equip;
+		DeleteInfo("Equipments_Info.txt", countLine);
+		InsertInfo("Equipments_Info.txt", node->pEquip, countLine);
+		return UPDATE;
 	}
 	else
 	{
 		Node* newNode = MakeNode(equip);
+		countLine = 1;
 		//头插
 		if (strcmp(equip->id, list->head->pEquip->id) < 0)
 		{
 			newNode->next = list->head;
 			list->head = newNode;
-			//写入文件，行数0
+			if(mode)
+				InsertInfo("Equipments_Info.txt", newNode->pEquip, countLine);
 		}
 		else
 		{
 			Node* curr = list->head;
-			int countLine = 1;
 			while (curr && curr->next)
 			{
+				++countLine;
 				if (strcmp(equip->id, curr->next->pEquip->id) < 0)//添加
 				{
 					newNode->next = curr->next;
 					curr->next = newNode;
-					//写入文件，行数countLine
-					return;
+					if(mode)
+						InsertInfo("Equipments_Info.txt", newNode->pEquip, countLine);
+					break;
 				}
 				curr = curr->next;
-				countLine++;
 			}
 			//尾插
 			if (!curr->next)
+			{
 				curr->next = newNode;
+				list->tail = newNode;
+				if(mode)
+					AddInfo("Equipments_Info.txt", "a+", newNode->pEquip);
+			}
 		}
 		list->LinkNum++;
 	}
+	return INSERT;
 }
 
 unsigned char* TypeCount(LinkList* list)
@@ -93,8 +112,33 @@ static void ID_sort(Equip* equip[])
 
 }
 
-void Date_sort(Equip* equip[])
+void Date_sort(LinkList* list)
 {
+	Equip** dateList = (Equip**)calloc(list->LinkNum, sizeof(Equip*));
+	Node* curr = list->head;
+	int i = 0;
+	while (curr)
+	{
+		dateList[i] = curr->pEquip;
+		i++;
+		curr = curr->next;
+	}
+
+	for (i = 0; i < list->LinkNum - 1; ++i)
+	{
+		int end = i;
+		Equip* key = dateList[end + 1];
+		while (end >= 0 && dateList[end]->buy_date > key->buy_date)
+		{
+			dateList[end + 1] = dateList[end];
+			--end;
+		}
+		dateList[end + 1] = key;
+	}
+	for (i = 0; i < list->LinkNum; ++i)
+		AddInfo("Equipments_Info_SortByDate.txt","a+", dateList[i]);
+
+	free(dateList);
 }
 
 void ScarpEquip(LinkList* list)
@@ -120,12 +164,12 @@ void ScarpEquip(LinkList* list)
 	//}
 }
 
-bool IsScarp(Equip* equip)
+bool IsScarp(const Equip* equip)
 {
 	return equip->flag;
 }
 
-LinkList SearchByName(LinkList* list,char* name)
+LinkList SearchByName(LinkList* list, const char* name)
 {
 	LinkList resList;
 	resList.head = MakeNode(NULL);
