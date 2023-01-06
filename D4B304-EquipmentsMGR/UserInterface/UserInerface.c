@@ -1,10 +1,9 @@
 #include "..\Main.h"
 #include "UserInterface.h"
 #include "..\EquipMgr\EquipMgr.h"
-#include "..\EquipMgr\FileMgr.h"
+#include "..\DataMgr\FileMgr.h"
 
 const char* cEquipType[TOTAL + 1] = { "MEC","CHM","MDC","ELC","SPC","TOTAL" };
-extern LinkList equipList;
 
 void SetupUI()
 {
@@ -187,7 +186,7 @@ static void InputInfo()
 		scanf("%lld%lf", &equip->buy_date, &equip->price);
 		getchar();
 		//报废初始设置
-		equip->scrap_date = 19000101;
+		equip->scrap_date = 0;
 		equip->flag = false;
 
 		printf("确认输入？(Y/N)\n");
@@ -205,10 +204,11 @@ static void InputInfo()
 
 			else
 			{
-				if (AddEquip(&equipList, equip,1))
+				if (AddEquip(&equipList, equip))
 					printf("已录入！\n");
 				else
 					printf("已更新！\n");
+				InsertInfo(dataFile, equip, GetEquipNo(&equipList, equip->id));
 			}
 		}
 		else if (ctrl == 'N' || ctrl == 'n')
@@ -231,33 +231,9 @@ static void Deletee()
 		gets(id);
 	//	getchar();//gets会留下\n
 		if (id[0] == 'N' || id[0] == 'n') break; //退出
-		long long line = 0;
-		Node* result = SearchById(&equipList, id, &line);
+		Node* result = SearchById(&equipList, id);
 		if (result)
 		{
-			Node* curr = equipList.head;
-			if (curr == result)
-				equipList.head = equipList.head->next;
-			else
-				//遍历链表寻找目标节点得前驱节点（curr）
-				while (curr)
-				{
-					if (curr->next == result)//普通节点处理
-					{
-						if (result != equipList.tail)
-						{
-							curr->next = result->next;
-							break;
-						}
-						else//尾节点处理
-						{
-							curr->next = NULL;
-							equipList.tail = curr;
-							break;
-						}
-					}
-					curr = curr->next;
-				}
 			printf("请确认删除对象：(Y/N)\n\n");
 			printf("设备种类\t设备名称\t设备编号\t购入日期\t销毁日期\t购入价格\n");
 			PrintInfo(result->pEquip);
@@ -266,11 +242,37 @@ static void Deletee()
 			if (ctrll != '\n')	getchar();
 			if (ctrll == 'Y' || ctrll == 'y')
 			{
+				Node* curr = equipList.head;
+				if (curr == result)
+					equipList.head = equipList.head->next;
+				else
+					//遍历链表寻找目标节点得前驱节点（curr）
+					while (curr)
+					{
+						
+						if (curr->next == result)//普通节点处理
+						{
+							if (result != equipList.tail)
+							{
+								curr->next = result->next;
+								break;
+							}
+							else//尾节点处理
+							{
+								curr->next = NULL;
+								equipList.tail = curr;
+								break;
+							}
+						}
+						curr = curr->next;
+					}
+				long long line = GetEquipNo(&equipList, result->pEquip->id);
 				free(result->pEquip->id);
 				free(result->pEquip->name);
 				free(result->pEquip);
+				free(result);
 				equipList.LinkNum--;
-				DeleteInfo("Equipments_Info.txt", line);
+				DeleteInfo(dataFile, line);
 				printf("已删除！\n");
 			}
 		}
@@ -297,8 +299,7 @@ static void Scrap()
 		char id[255];
 		gets(id);
 		if (id[0] == 'N' || id[0] == 'n') break; //退出
-		long long no;
-		Node* result = SearchById(&equipList, id, &no);
+		Node* result = SearchById(&equipList, id);
 		if (result)
 		{
 			printf("请确认报废对象：(Y/N)\n\n");
@@ -309,6 +310,7 @@ static void Scrap()
 			scanf("%lld", &date);
 			result->pEquip->scrap_date = date;
 			result->pEquip->flag = true;
+			long long no = GetEquipNo(&equipList, result->pEquip->id);
 			InsertInfo("Equipments_Info.txt", result->pEquip, no);
 			printf("已修改设备状态！");
 		}
