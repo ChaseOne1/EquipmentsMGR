@@ -1,75 +1,80 @@
 #include "..\Main.h"
 #include "EquipMgr.h"
-#include "..\UserInterface\UserInterface.h"
-#include "FileMgr.h"
+#include "..\DataMgr\FileMgr.h"
 
-#define INSERT 1
-#define UPDATE 0
+/**
+* @Function: SearchById
+* @Brief: 通过设备id搜索并返回与之关联的节点
+* @Param1: list 链表
+* @Param2: id 搜索的设备id
+* @Param3: No 设备所在链表中的序号(输出参数)
+* @Return: 目标设备关联到的节点，无结果返回NULL
+**/
 
-Node* SearchById(LinkList* list, const char* id, long long* No)
+Node* SearchById(LinkList* list, const char* id)
 {
-	*No = 1;
 	Node* curr = list->head;
 	while (curr)
 	{
 		if (!strcmp(curr->pEquip->id, id))
 			return curr;
 		curr = curr->next;
-		++(*No);
 	}
 	return NULL;
 }
 
-bool AddEquip(LinkList* list, const Equip* equip,char mode)
+long long GetEquipNo(LinkList* list, const char* id)
 {
-	long long countLine = 0;
-	Node* node = SearchById(list, equip->id, &countLine);
+	long long No = 0;
+	Node* curr = list->head;
+	while (curr)
+	{
+		++No;
+		if (!strcmp(curr->pEquip->id, id))
+			return No;
+		curr = curr->next;
+	}
+	return 0;
+}
+
+Status AddEquip(LinkList* list, const Equip* equip)
+{
+	if (!list->LinkNum)
+	{
+		PushFront(list, MakeNode(equip));
+		list->tail = list->head;
+		list->LinkNum++;
+		return INSERT;
+	}
+
+	Node* node = SearchById(list, equip->id);
 	if (node)
 	{
 		free(node->pEquip->name);
 		free(node->pEquip->id);
 		free(node->pEquip);
 		node->pEquip = equip;
-		DeleteInfo("Equipments_Info.txt", countLine);
-		InsertInfo("Equipments_Info.txt", node->pEquip, countLine);
 		return UPDATE;
 	}
 	else
 	{
-		Node* newNode = MakeNode(equip);
-		countLine = 1;
-		//头插
+		Node* newNode = MakeNode(equip), * curr = list->head;
 		if (strcmp(equip->id, list->head->pEquip->id) < 0)
-		{
-			newNode->next = list->head;
-			list->head = newNode;
-			if(mode)
-				InsertInfo("Equipments_Info.txt", newNode->pEquip, countLine);
-		}
+			PushFront(list, newNode);
 		else
 		{
-			Node* curr = list->head;
-			while (curr && curr->next)
+			while (curr->next)
 			{
-				++countLine;
-				if (strcmp(equip->id, curr->next->pEquip->id) < 0)//添加
+				if (strcmp(equip->id, curr->next->pEquip->id) < 0)
 				{
 					newNode->next = curr->next;
 					curr->next = newNode;
-					if(mode)
-						InsertInfo("Equipments_Info.txt", newNode->pEquip, countLine);
 					break;
 				}
 				curr = curr->next;
 			}
-			//尾插
 			if (!curr->next)
-			{
-				curr->next = newNode;
-				list->tail = newNode;
-				if(mode)
-					AddInfo("Equipments_Info.txt", "a+", newNode->pEquip);
-			}
+				PushBack(list, newNode);
 		}
 		list->LinkNum++;
 	}
@@ -136,7 +141,7 @@ void Date_sort(LinkList* list)
 		dateList[end + 1] = key;
 	}
 	for (i = 0; i < list->LinkNum; ++i)
-		AddInfo("Equipments_Info_SortByDate.txt","a+", dateList[i]);
+		AddInfo("Equipments_Info_SortByDate.txt", "a+", dateList[i]);
 
 	free(dateList);
 }

@@ -2,37 +2,19 @@
 #include "Main.h"
 #include "EquipMgr\EquipMgr.h"
 #include "EquipMgr\Equipment.h"
-#include "UserInterface/UserInterface.h"
-#include "EquipMgr\FileMgr.h"
+#include "UserInterface\UserInterface.h"
+#include "DataMgr\FileMgr.h"
 
 LinkList equipList;
-
-void System_Initialize(const char* srcFile)
-{
-	long long line = 1;
-	equipList.LinkNum = 0;
-	Equip* equip = ReadInfo(srcFile, line);
-	equipList.head = MakeNode(equip);
-	equipList.LinkNum++;
-	if(strcmp("Equipments_Info.txt",srcFile))
-		AddInfo("Equipments_Info.txt","a+", equip);
-	line++;
-	while (equip = ReadInfo(srcFile, line))
-	{	
-		if(!strcmp("Equipments_Info.txt",srcFile))
-			AddEquip(&equipList, equip,0);
-		else
-			AddEquip(&equipList, equip,1);
-		line++;
-	}
-}
-
+const char dataFile[] = "Equipments_Info.txt";
+void System_Initialize(const char* srcFile);
 void System_Destory();
+
 
 int main(int atgc, char* argv[])
 {
 	SetConsoleOutputCP(65001);//修改控制台的编码格式为utf-8
-	System_Initialize(atgc > 1 ? argv[1] : "Equipments_Info.txt");
+	System_Initialize("data.txt");
 	while (true)
 	{
 		SetupUI();
@@ -40,9 +22,32 @@ int main(int atgc, char* argv[])
 		if (SystemControl(getchar()))
 			break;
 	}
-	system("pause");
 	System_Destory();
 	return 0;
+}
+
+void System_Initialize(const char* srcFile)
+{
+	equipList.LinkNum = 0;
+	long long readLine = 1;
+	Equip* equip = NULL;
+	while (equip = ReadInfo(dataFile, readLine))
+	{
+		AddEquip(&equipList, equip);
+		++readLine;
+	}
+	if (!srcFile)	return;
+	readLine = 1;
+	long long lineNo = 0;
+	while (equip = ReadInfo(srcFile, readLine))
+	{
+		if (AddEquip(&equipList, equip))
+		{
+			lineNo = GetEquipNo(&equipList, equip->id);
+			InsertInfo(dataFile, equip, lineNo);
+		}
+		++readLine;
+	}
 }
 
 void System_Destory()
