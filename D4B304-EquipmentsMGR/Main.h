@@ -5,6 +5,3 @@
 #include <assert.h>
 #include "EquipMgr\Equipment.h"
 #include "DataMgr\List.h"
-
-extern LinkList equipList;
-extern const char dataFile[];

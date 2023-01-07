@@ -1,16 +1,10 @@
 #pragma once
 
-typedef enum
-{
-	UPDATE,
-	INSERT
-}Status;
-
 Node* SearchById(LinkList* list, const char* id);
 
 long long GetEquipNo(LinkList* list, const char* id);
 
-Status AddEquip(LinkList* list, const Equip* equip);
+bool AddEquip(LinkList* list, const Equip* equip);
 
 unsigned char* TypeCount(LinkList* list);
 

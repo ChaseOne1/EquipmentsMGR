@@ -1,5 +1,7 @@
 #include "FileMgr.h"
 
+FILE* dataFile = NULL;
+FILE* outputFile = NULL;
 extern const char* cEquipType[TOTAL + 1];
 
 static long long dtoend(FILE* fp)
@@ -11,11 +13,9 @@ static long long dtoend(FILE* fp)
 	return endpos - curpos;      // Return the distance!
 }
 
-Equip* ReadInfo(const char* fileName, const long long destLine)
+Equip* ReadInfo(FILE* file, const long long destLine)
 {
 	//SPC Equip1 id001 2234 31254
-
-	FILE* file = fopen(fileName, "r");
 	assert(file);
 	long long line = 1;
 	char ch;
@@ -33,7 +33,6 @@ Equip* ReadInfo(const char* fileName, const long long destLine)
 	fscanf(file, "%s", type);
 	if (feof(file))
 	{
-		fclose(file);
 		return NULL;
 	}
 	Equip* equip = (Equip*)malloc(sizeof(Equip));
@@ -63,26 +62,23 @@ Equip* ReadInfo(const char* fileName, const long long destLine)
 		free(equip->id);
 		free(equip->name);
 		free(equip);
-		fclose(file);
 		return NULL;
 	}
-	fclose(file);
 	return equip;
 }
 
 
-void AddInfo(const char* fileName, const char* mode, const Equip* equip)
+Node* AppendInfo(Equip** data, FILE* file)
 {
-	FILE* file = fopen(fileName, mode);
-	assert(file);
+	Equip* equip = *data;
 	fprintf(file, "%-4s\t%-6s\t%-6s\t%-10lld\t%-8lld\t%.3lf\n", cEquipType[equip->type], equip->name, equip->id,
 		equip->buy_date, equip->scrap_date, equip->price);//写入文件信息
-	fclose(file);
+	return (Node*)data;
 }
 
-void InsertInfo(const char* fileName, const Equip* equip, const long long destLine)
+
+void InsertInfo(FILE* file, const Equip* equip, const long long destLine)
 {
-	FILE* file = fopen(fileName, "r+");
 	assert(file);
 	long long line = 1;
 	while (line != destLine && !feof(file))
@@ -91,7 +87,7 @@ void InsertInfo(const char* fileName, const Equip* equip, const long long destLi
 	if (feof(file))
 	{
 		fclose(file);
-		AddInfo(fileName, "a+", equip);
+		AddInfo(file, "a+", equip);
 		return;
 	}
 
@@ -105,43 +101,16 @@ void InsertInfo(const char* fileName, const Equip* equip, const long long destLi
 		equip->buy_date, equip->scrap_date, equip->price);//写入文件信息
 	fwrite(buffer, sizeof(char), bufSize, file);//复原后续部分
 	free(buffer);
-	fclose(file);
 }
 
-void DeleteInfo(const char* fileName, const long long destLine)
+void DeleteInfo(FILE* file, const long long destLine)
 {
-	FILE* file = fopen(fileName, "rt+");
-	assert(file);
-	long long line = 1;
-	while (line != destLine)
-		while (getc(file) == '\n')
-			line++;
-	fseek(file, -1, SEEK_CUR);
-	long long currPos = ftell(file);//当前位置
-	while (line != destLine + 1)
-		while (getc(file) == '\n')
-			line++;
-	fseek(file, -1, SEEK_CUR);
-	long long bufSize = dtoend(file);//后续字节长度
-	char* buffer = (char*)malloc(bufSize);
-	fread(buffer, sizeof(char), bufSize, file);//保存后续部分
-	fseek(file, currPos, SEEK_SET);//重置文件指针
-	fwrite(buffer, sizeof(char), bufSize, file);//复原后续部分
-	free(buffer);
-	fseek(file, -3, SEEK_END);
-	char wordCount = 0;
-	while (fgetc(file) != '\n')
-	{
-		fseek(file, -2, SEEK_CUR);
-		++wordCount;
-	}
-	fseek(file, 0, SEEK_SET);
-	bufSize = dtoend(file) - wordCount - 4;
-	buffer = (char*)malloc(bufSize);
-	fread(buffer, sizeof(char), bufSize, file);
-	fclose(file);
-	file = fopen(fileName, "w+");
-	fwrite(buffer, sizeof(char), bufSize, file);
-	fclose(file);
 }
 
+void UpdateInfoFile(LinkList* list)
+{
+	fclose(dataFile);
+	dataFile = fopen(dataFileName, "w");
+	ListForAllNode(list, AppendInfo, dataFile);
+	fclose(dataFile);
+}
