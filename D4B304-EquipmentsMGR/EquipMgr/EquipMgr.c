@@ -2,15 +2,6 @@
 #include "EquipMgr.h"
 #include "..\DataMgr\FileMgr.h"
 
-/**
-* @Function: SearchById
-* @Brief: 通过设备id搜索并返回与之关联的节点
-* @Param1: list 链表
-* @Param2: id 搜索的设备id
-* @Param3: No 设备所在链表中的序号(输出参数)
-* @Return: 目标设备关联到的节点，无结果返回NULL
-**/
-
 Node* SearchById(LinkList* list, const char* id)
 {
 	Node* curr = list->head;
@@ -37,8 +28,9 @@ long long GetEquipNo(LinkList* list, const char* id)
 	return 0;
 }
 
-Status AddEquip(LinkList* list, const Equip* equip)
+bool AddEquip(LinkList* list, const Equip* equip)
 {
+	const bool UPDATE = 0, INSERT = 1;
 	if (!list->LinkNum)
 	{
 		PushFront(list, MakeNode(equip));
@@ -119,17 +111,9 @@ static void ID_sort(Equip* equip[])
 
 void Date_sort(LinkList* list)
 {
-	Equip** dateList = (Equip**)calloc(list->LinkNum, sizeof(Equip*));
-	Node* curr = list->head;
-	int i = 0;
-	while (curr)
-	{
-		dateList[i] = curr->pEquip;
-		i++;
-		curr = curr->next;
-	}
-
-	for (i = 0; i < list->LinkNum - 1; ++i)
+	Equip** dateList = ListValToArry(list);
+	//Sort
+	for (int i = 0; i < list->LinkNum - 1; ++i)
 	{
 		int end = i;
 		Equip* key = dateList[end + 1];
@@ -140,8 +124,9 @@ void Date_sort(LinkList* list)
 		}
 		dateList[end + 1] = key;
 	}
-	for (i = 0; i < list->LinkNum; ++i)
-		AddInfo("Equipments_Info_SortByDate.txt", "a+", dateList[i]);
+	//Output
+	for (int i = 0; i < list->LinkNum; ++i)
+		AppendInfo(&dateList[i], outputFile);
 
 	free(dateList);
 }
