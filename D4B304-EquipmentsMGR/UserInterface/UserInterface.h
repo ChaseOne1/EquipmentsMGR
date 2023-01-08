@@ -6,7 +6,7 @@ extern const char* cEquipType[TOTAL + 1];
 /**
 * @Function: SetupUI
 * @Brief:	 设置UI系统工作的链表对象
-* @Param1:	 链表对象
+* @Param1:	 UI工作的链表对象
 * @Return:	 void
 **/
 void SetupUI(const LinkList* list);
@@ -27,6 +27,15 @@ void MainMenuDisplay(void);
 * @Return:	 是否退出
 **/
 bool SystemControl(char ctrl);
+
+
+/**
+* @Function: PrintInfo（回调函数）
+* @Brief:	 输出参数对象的设备信息
+* @Param:	 欲读取的对象(Node* / Equip**)
+* @Return:	 返回值永远为NULL
+**/
+Node* PrintInfo(Equip** data, void* pData);
 
 /**
 * @Function: StrToType

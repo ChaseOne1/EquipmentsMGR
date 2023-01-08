@@ -4,11 +4,21 @@
 #include "..\DataMgr\FileMgr.h"
 
 const char* cEquipType[TOTAL + 1] = { "MEC","CHM","MDC","ELC","SPC","TOTAL" };
-static LinkList equipList;
+
+static LinkList* pEquipList;
+
+static void Input();	//添加
+static void Deletee();	//删除
+static void Count();	//统计
+static void Scrap();	//报废
+static void Search();	//搜索
+static void Sort();		//排序
+static void ShowAll();	//浏览
+static bool Exit();		//退出
 
 void SetupUI(const LinkList* list)
 {
-	equipList = *list;
+	pEquipList = list;
 }
 
 void MainMenuDisplay()
@@ -27,9 +37,44 @@ void MainMenuDisplay()
 	printf("--------------------------------------------\n");
 }
 
-Node* PrintInfo(Node* node, void* pData)
+bool SystemControl(char ctrl)
 {
-	Equip* equip = node->pEquip;
+	system("cls");
+	switch (ctrl)
+	{
+	case '1':
+		Input();
+		break;
+	case'2':
+		Deletee();
+		break;
+	case '3':
+		Count();
+		break;
+	case '4':
+		Scrap();
+		break;
+	case '5':
+		Search();
+		break;
+	case '6':
+		Sort();
+		break;
+	case '7':
+		ShowAll();
+		break;
+	case '0':
+		return Exit();
+	default:
+		break;
+	}
+	system("pause");
+	return false;
+}
+
+Node* PrintInfo(Equip** data, void* pData)
+{
+	Equip* equip = *data;
 	printf("%-8s\t", cEquipType[equip->type]);
 	printf("%-8s\t", equip->name);
 	printf("%-8s\t", equip->id);
@@ -38,6 +83,7 @@ Node* PrintInfo(Node* node, void* pData)
 	printf("%.3lf\t", equip->price);
 	putchar('\n');
 	putchar('\n');
+	return data;
 }
 
 eEquipType StrToType(const char* type)
@@ -76,53 +122,62 @@ bool InputEquip(Equip* equip, FILE* stream)
 	return true;
 }
 
-static void Search()
+static void Input()
 {
-	printf("支持的查询方式有：1.设备名称  2.报废标志\n请选择：");
-	char ctrl = getchar();
-	if (ctrl == '1')
+	char type[4];
+	printf("请输入设备信息...\n格式：设备种类 设备名称 设备编号 购入日期 销毁日期 购入价格\n(设备种类：机械类:MEC、化学类:CHM、医学类:MDC、电子类:ELC、特殊类:SPC)\n");
+	printf("输入示例: CHM Equip1 ID1900111 20221219 20230107 648.0\n退出请输入N\n");
+	do
 	{
-		printf("请输入欲查询的设备名称：\n> ");
-		char name[255] = { 0 };
-		scanf("%s", name);
-		LinkList list = SearchByName(&equipList, name);
-		if (list.LinkNum - 1)
+		printf("> ");
+		char ch;
+		while ((ch = getchar()) == '\n');
+		if (ch == 'N' || ch == 'n')		break;//退出
+		ungetc(ch, stdin);
+		Equip* equip = MakeEquip();
+		assert(equip);
+		if (InputEquip(equip, stdin))
+			if (AddEquip(pEquipList, equip))
+				printf("已录入！\n");
+			else
+				printf("已更新！\n");
+		else
 		{
-			printf("查询结果如下：\n\n");
+			printf("输入中出现错误，请重试！\n");
+			FreeEquip(&equip);
+		}
+		putchar('\n');
+	} while (true);
+}
+
+static void Deletee()
+{
+	do
+	{
+		char id[255] = { 0 };
+		printf("请输入欲删除的设备的编号\n退出请输入N\n> ");
+		scanf("%s", id);
+		if (id[0] == 'N' || id[0] == 'n') break; //退出
+		Node* result = SearchById(pEquipList, id);
+		if (result)
+		{
+			printf("请确认删除对象：(Y/N)\n\n");
 			printf("设备种类\t设备名称\t设备编号\t购入日期\t销毁日期\t购入价格\n");
-			ListForAllNode(&list, PrintInfo, NULL);
-			FreeList(&list);
+			PrintInfo(&result->pEquip, NULL);
+			printf("> ");
+			char ch = 0;
+			while ((ch = getchar()) == '\n');
+			if (ch == 'Y' || ch == 'y')
+			{
+				FreeNode(pEquipList, &result, true);
+				printf("已删除！\n");
+			}
 		}
 		else
-			printf("无该名称设备!\n");
-	}
-	else if (ctrl == '2')
-	{
-		printf("\n请选择报废标志：已报废(Y)/未报废(N)\n> ");
-		char flag = getchar();
-		if (flag != '\n')	getchar();
-		else return;
-		if (flag == 'Y' || flag == 'y')
-		{
-			Node* curr2 = equipList.head;
-			while (curr2)
-			{
-				if (IsScarp(curr2->pEquip))
-					PrintInfo(curr2->pEquip);
-				curr2 = curr2->next;
-			}
-		}
-		else if (flag == 'N' || flag == 'n')
-		{
-			Node* curr3 = equipList.head;
-			while (curr3)
-			{
-				if (!IsScarp(curr3->pEquip))
-					PrintInfo(curr3->pEquip);
-				curr3 = curr3->next;
-			}
-		}
-	}
+			printf("未找到id为%s的设备！\n", id);
+		putchar('\n');
+	} while (true);
+
 }
 
 static void Count()
@@ -130,10 +185,10 @@ static void Count()
 	system("cls");
 	char type[6] = { 0 };
 	eEquipType TYPE = -1;
-	unsigned char* result = TypeCount(&equipList);
+	unsigned char* result = TypeCount(pEquipList);
 	printf("请输入欲统计的类别： (机械类:MEC、化学类:CHM、医学类:MDC、电子类:ELC、特殊类:SPC、所有:TOTAL)\n退出请输入N\n");
 	while (true)
-	{	
+	{
 		printf("> ");
 		scanf("%s", type);
 		TYPE = StrToType(type);
@@ -148,191 +203,100 @@ static void Count()
 	result = NULL;
 }
 
-static void ShowAll()
-{
-	printf("设备种类\t设备名称\t设备编号\t购入日期\t销毁日期\t购入价格\n");
-	ListForAllNode(&equipList, PrintInfo, NULL);
-	printf("已全部显示完毕！\n");
-}
-
-static void Input()
-{
-	char type[4];
-	printf("请输入设备信息...\n格式：设备种类 设备名称 设备编号 购入日期 销毁日期 购入价格\n(设备种类：机械类:MEC、化学类:CHM、医学类:MDC、电子类:ELC、特殊类:SPC)\n");
-	printf("输入示例: CHM Equip1 ID1900111 20221219 20230107 648.0\n退出请输入N\n");
-	do
-	{
-		printf("> ");
-		char ch;
-		while ((ch = getchar()) == '\n');
-		if (ch == 'N' || ch == 'n')
-			break;
-		ungetc(ch, stdin);
-		Equip* equip = MakeEquip();
-		assert(equip);
-		if (InputEquip(equip, stdin))
-			if (AddEquip(&equipList, equip))
-				printf("已录入！\n");
-			else
-				printf("已更新！\n");
-		else
-		{
-			printf("输入中出现错误，请重试！\n");
-			FreeEquip(equip);
-		}
-		putchar('\n');
-	} while (true);
-	UpdateInfoFile(&equipList);
-}
-
-static void Deletee()
-{
-	do
-	{
-		char id[255];
-		printf("请输入欲删除的设备的编号\n退出请输入N");
-		printf("\n> ");
-		gets(id);
-	//	getchar();//gets会留下\n
-		if (id[0] == 'N' || id[0] == 'n') break; //退出
-		Node* result = SearchById(&equipList, id);
-		if (result)
-		{
-			printf("请确认删除对象：(Y/N)\n\n");
-			printf("设备种类\t设备名称\t设备编号\t购入日期\t销毁日期\t购入价格\n");
-			PrintInfo(result->pEquip);
-			printf("> ");
-			char ctrll = getchar();
-			if (ctrll != '\n')	getchar();
-			if (ctrll == 'Y' || ctrll == 'y')
-			{
-				Node* curr = equipList.head;
-				if (curr == result)
-					equipList.head = equipList.head->next;
-				else
-					//遍历链表寻找目标节点得前驱节点（curr）
-					while (curr)
-					{
-						
-						if (curr->next == result)//普通节点处理
-						{
-							if (result != equipList.tail)
-							{
-								curr->next = result->next;
-								break;
-							}
-							else//尾节点处理
-							{
-								curr->next = NULL;
-								equipList.tail = curr;
-								break;
-							}
-						}
-						curr = curr->next;
-					}
-				long long line = GetEquipNo(&equipList, result->pEquip->id);
-				free(result->pEquip->id);
-				free(result->pEquip->name);
-				free(result->pEquip);
-				free(result);
-				equipList.LinkNum--;
-				DeleteInfo(dataFile, line);
-				printf("已删除！\n");
-			}
-		}
-		else
-			printf("未找到id为%s的设备！\n", id);
-
-		//printf("继续删除？(Y/N) > ");
-		//char ctrl = getchar();
-		//if (ctrl != '\n')	getchar();
-		//if (ctrl == 'N' || ctrl == 'n')
-		//	break;
-		putchar('\n');
-	} while (true);
-
-}
-
 static void Scrap()
 {
-	system("cls");
-	do 
+	do
 	{
 		printf("请输入欲修改的设备的编号\n退出请输入N");
 		printf("> ");
 		char id[255] = { 0 };
 		scanf("%s", id);
 		if (id[0] == 'N' || id[0] == 'n') break; //退出
-		Node* result = SearchById(&equipList, id);
+		Node* result = SearchById(pEquipList, id);
 		if (result)
 		{
 			printf("请确认报废对象：(Y/N)\n\n");
 			printf("设备种类\t设备名称\t设备编号\t购入日期\t销毁日期\t购入价格\n");
-			PrintInfo(result->pEquip);
-			printf("请输入报废日期（格式20221212）: > ");
-			long long date = 0;
-			scanf("%lld", &date);
-			result->pEquip->scrap_date = date;
-			result->pEquip->flag = date;
-			printf("已修改设备状态！");
+			PrintInfo(result, NULL);
+			char ch = 0;
+			while ((ch = getchar()) == '\n');
+			if (ch == 'Y' || ch == 'y')
+			{
+				printf("请输入报废日期(格式20221212):> ");
+				long long date = 0;
+				scanf("%lld", &date);
+				ScarpEquip(result->pEquip, date);
+				printf("已修改设备状态！");
+			}
 		}
 		else
-			printf("没有编号为:%s的设备！", id);
+			printf("没有编号为：%s的设备！", id);
 		putchar('\n');
 	} while (true);
-	UpdateInfoFile(&equipList);
+}
+
+static void Search()
+{
+	printf("支持的查询方式有：1.设备名称  2.报废标志\n请选择(按N退出): > ");
+	char ctrl = 0;
+	while ((ctrl = getchar()) == '\n');
+	LinkList* resultList = NULL;
+	if (ctrl == '1')
+	{
+		printf("请输入欲查询的设备名称：\n> ");
+		char name[255] = { 0 };
+		scanf("%s", name);
+		resultList = ListForAllNodeL(pEquipList, NAME, name);
+	}
+	else if (ctrl == '2')
+	{
+		printf("\n请选择报废标志：已报废(Y) / 未报废(N)\n> ");
+		while ((ctrl = getchar()) == '\n');
+		if (ctrl == 'Y' || ctrl == 'y')
+			resultList = ListForAllNodeL(pEquipList, ISSCRAPPED, true);
+		else if (ctrl == 'N' || ctrl == 'n')
+			resultList = ListForAllNodeL(pEquipList, ISSCRAPPED, false);
+	}
+	else
+		return;
+	printf("\n设备种类\t设备名称\t设备编号\t购入日期\t销毁日期\t购入价格\n");
+	ListForAllNodeV(resultList, PrintInfo, NULL);
+	FreeList(resultList, false);
+	resultList = NULL;
 }
 
 static void Sort()
 {
-	printf("正在处理请稍后...\n");
-	outputFile = fopen(outputFileName, "w");
-	Date_sort(&equipList);
+	printf("所有设备信息将会按购入日期升序排序！\n");
+	printf("是否继续？(Y/N) > ");
+	char ctrl = 0;
+	while ((ctrl = getchar()) == '\n');
+	if (ctrl == 'N' || ctrl == 'n')		return;
+	FILE* outputFile = fopen(gsOutputFileName, "w");
+	Equip** dateList = Date_sort(pEquipList);
+	for (int i = 0; i < pEquipList->LinkNum; ++i)
+		AppendInfoToFile(&dateList[i], outputFile);//param1 try "dateList++" haha
 	fclose(outputFile);
-	printf("结果已输出到文件%s", outputFileName);
+	printf("结果已输出到文件%s\n", gsOutputFileName);
+}
+
+static void ShowAll()
+{
+	printf("设备种类\t设备名称\t设备编号\t购入日期\t销毁日期\t购入价格\n");
+	ListForAllNodeV(pEquipList, PrintInfo, NULL);
+	printf("已全部显示完毕！\n");
 }
 
 static bool Exit()
 {
 	printf("确认退出？(Y/N)\n> ");
-	char ctrl = getchar();
+	char ctrl = 0;
+	while ((ctrl = getchar()) == '\n');
 	if (ctrl == 'Y' || ctrl == 'y')
+	{
+		printf("正在退出...\n");
 		return true;
+	}
 	else
 		return false;
-}
-
-bool SystemControl(char ctrl)
-{
-	system("cls");
-	//if (ctrl != '\n')	getchar();
-	switch (ctrl)
-	{
-	case '1':
-		Input();
-		break;
-	case'2':
-		//Deletee();
-		break;
-	case '3':
-		Count();
-		break;
-	case '4':
-		Scrap();
-		break;
-	case '5':
-		Search();
-		break;
-	case '6':
-		Sort();
-		break;
-	case '7':
-		ShowAll();
-		break;
-	case '0':
-		return Exit();
-	default:
-		break;
-	}
-	return false;
 }

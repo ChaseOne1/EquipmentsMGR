@@ -2,56 +2,23 @@
 #include "EquipMgr.h"
 #include "..\DataMgr\FileMgr.h"
 
-Node* SearchById(LinkList* list, const char* id)
-{
-	Node* curr = list->head;
-	while (curr)
-	{
-		if (!strcmp(curr->pEquip->id, id))
-			return curr;
-		curr = curr->next;
-	}
-	return NULL;
-}
-
-long long GetEquipNo(LinkList* list, const char* id)
-{
-	long long No = 0;
-	Node* curr = list->head;
-	while (curr)
-	{
-		++No;
-		if (!strcmp(curr->pEquip->id, id))
-			return No;
-		curr = curr->next;
-	}
-	return 0;
-}
 
 bool AddEquip(LinkList* list, const Equip* equip)
 {
 	const bool UPDATE = 0, INSERT = 1;
-	if (!list->LinkNum)
-	{
-		PushFront(list, MakeNode(equip));
-		list->tail = list->head;
-		list->LinkNum++;
-		return INSERT;
-	}
-
 	Node* node = SearchById(list, equip->id);
 	if (node)
 	{
-		free(node->pEquip->name);
-		free(node->pEquip->id);
-		free(node->pEquip);
+		FreeEquip(&node->pEquip);
 		node->pEquip = equip;
 		return UPDATE;
 	}
 	else
 	{
 		Node* newNode = MakeNode(equip), * curr = list->head;
-		if (strcmp(equip->id, list->head->pEquip->id) < 0)
+		if (!list->LinkNum)
+			PushFront(list, MakeNode(equip));
+		else if (strcmp(equip->id, list->head->pEquip->id) < 0)
 			PushFront(list, newNode);
 		else
 		{
@@ -61,6 +28,7 @@ bool AddEquip(LinkList* list, const Equip* equip)
 				{
 					newNode->next = curr->next;
 					curr->next = newNode;
+					list->LinkNum++;
 					break;
 				}
 				curr = curr->next;
@@ -68,7 +36,6 @@ bool AddEquip(LinkList* list, const Equip* equip)
 			if (!curr->next)
 				PushBack(list, newNode);
 		}
-		list->LinkNum++;
 	}
 	return INSERT;
 }
@@ -109,7 +76,7 @@ static void ID_sort(Equip* equip[])
 
 }
 
-void Date_sort(LinkList* list)
+Equip** Date_sort(LinkList* list)
 {
 	Equip** dateList = ListValToArry(list);
 	//Sort
@@ -124,57 +91,39 @@ void Date_sort(LinkList* list)
 		}
 		dateList[end + 1] = key;
 	}
-	//Output
-	for (int i = 0; i < list->LinkNum; ++i)
-		AppendInfo(&dateList[i], outputFile);
-
-	free(dateList);
+	return dateList;
 }
 
-void ScarpEquip(LinkList* list)
+void ScarpEquip(Equip* equip,long long scrap_date)
 {
-	//struct tm t;
-	//time_t now;
-	//time(&now);
-	//localtime_s(&t, &now);
-	//long long a, x, y, z, sum;
-	//x = t.tm_year + 1900;
-	//y = t.tm_mon + 1;
-	//z = t.tm_mday;
-	//sum = 10000 * x + y * 100 + z;//将当前日期转化为与scrap_date相同格式
-	//Node* sky = list->head;
-	//while (sky)
-	//{
-	//	a = sky->pEquip->scrap_date;
-	//	if (a < sum)
-	//		sky->pEquip->flag = false;
-	//	else
-	//		sky->pEquip->flag = true;
-	//	sky = sky->next;//报废处理
-	//}
+	equip->flag = equip->scrap_date = scrap_date;
 }
 
-bool IsScarp(const Equip* equip)
+Node* SearchById(LinkList* list, const char* id)
 {
-	return equip->flag;
-}
-
-LinkList SearchByName(LinkList* list, const char* name)
-{
-	LinkList resList;
-	resList.head = MakeNode(NULL);
-	resList.tail = resList.head;
-	resList.LinkNum = 1;
-	//结果链表中头节点数据部分为空，第二节点为实首节点,实节点个数为LinkNum-1
+	if (!list->LinkNum)	return NULL;
 	Node* curr = list->head;
 	while (curr)
 	{
-		if (!strcmp(name, curr->pEquip->name))
-		{
-			resList.tail = resList.tail->next = MakeNode(curr->pEquip);
-			resList.LinkNum++;
-		}
+		if (!strcmp(curr->pEquip->id, id))
+			return curr;
 		curr = curr->next;
 	}
-	return resList;
+	return NULL;
+}
+
+Node* Name_cmp(Node* node, void* pData)
+{
+	if (!strcmp((char*)pData, node->pEquip->name))
+		return node;
+	else
+		return NULL;
+}
+
+Node* IsScarpped_cmp(Node* node, void* pData)
+{
+	if (node->pEquip->flag == (bool)pData)
+		return node;
+	else
+		return NULL;
 }

@@ -12,7 +12,7 @@ typedef struct NodeList
 {
 	Node* head;
 	Node* tail;
-	int LinkNum;
+	long long LinkNum;
 }LinkList;
 
 
@@ -32,10 +32,12 @@ Node* MakeNode(Equip* equip);
 /**
 * @Function: FreeNode
 * @Brief:	 释放节点及其数据部分（均动态分配的）
-* @Param1:	 欲释放的节点
+* @Param1:	 节点所在链表（可为NULL）
+* @Param2:	 欲释放的节点的二级指针
+* @Param3:	 是否释放节点的数据部分
 * @Return:	 void
 **/
-void FreeNode(Node* node);
+void FreeNode(LinkList* list, Node** node, bool flag);
 
 
 /**
@@ -49,8 +51,18 @@ LinkList* MakeList(Node* head, Node* tail);
 
 
 /**
+* @Function: FreeList
+* @Brief:	 释放链表及其节点(均动态分配的)
+* @Param1:	 欲释放的链表的二级指针
+* @Param2:	 是否释放链表节点的数据部分
+* @Return:	 void
+**/
+void FreeList(LinkList** pList, bool flag);
+
+
+/**
 * @Function: PushFront
-* @Brief:	 将参数节点置为链表头
+* @Brief:	 将参数节点添加到链表头
 * @Param1:	 欲操作的链表
 * @Param2:	 准链表头
 * @Return:	 void
@@ -59,8 +71,18 @@ void PushFront(LinkList* list, Node* node);
 
 
 /**
+* @Function: PopFront
+* @Brief:	 删除参数链表头节点
+* @Param1:	 欲操作的链表
+* @Param2:	 是否释放链表节点的数据部分
+* @Return:	 void
+**/
+void PopFront(LinkList* list, bool flag);
+
+
+/**
 * @Function: PushBack
-* @Brief:	 将参数节点置为链表尾
+* @Brief:	 将参数节点添加到链表尾
 * @Param1:	 欲操作的链表
 * @Param2:	 准链表尾
 * @Return:	 void
@@ -69,23 +91,35 @@ void PushBack(LinkList* list, Node* node);
 
 
 /**
-* @Function: FreeList
-* @Brief:	 释放链表及其节点(均动态分配的)
-* @Param1:	 欲释放的链表
+* @Function: PopBack
+* @Brief:	 删除参数链表尾节点
+* @Param1:	 欲操作的链表
+* @Param2:	 是否释放链表节点的数据部分
 * @Return:	 void
 **/
-void FreeList(LinkList* list);
+void PopBack(LinkList* list, bool flag);
 
 
 /**
-* @Function: ListForAllNode
+* @Function: ListForAllNodeL
+* @Brief:	 为参数链表同步回调参数回调函数，并创建复制于回调函数返回的节点的堆区节点组成的堆区链表(这句话NO ERROR!!!)
+* @Param1:	 欲操作的链表
+* @Param2:	 回调函数，返回值应为当前处理的节点，参数1为当前节点 参数2为自定义数据
+* @Param3:	 回调函数的参数2，自定义数据
+* @Return:	 由复制的、储存在堆区的新节点组成的堆区链表，复制对象是回调函数返回的节点
+**/
+LinkList* ListForAllNodeL(LinkList* list, NodeCallBack pfCallBack, void* pData);
+
+
+/**
+* @Function: ListForAllNodeV
 * @Brief:	 为参数链表同步回调参数回调函数
 * @Param1:	 欲操作的链表
 * @Param2:	 回调函数，返回值应为当前处理的节点，参数1为当前节点 参数2为自定义数据
 * @Param3:	 回调函数的参数2，自定义数据
 * @Return:	 void
 **/
-void ListForAllNode(LinkList* list, NodeCallBack pfCallBack, void* pData);
+void ListForAllNodeV(LinkList* list, NodeCallBack pfCallBack, void* pData);
 
 
 /**

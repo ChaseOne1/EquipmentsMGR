@@ -1,13 +1,11 @@
-#include <windows.h>
 #include "Main.h"
 #include "EquipMgr\EquipMgr.h"
-#include "EquipMgr\Equipment.h"
-#include "UserInterface\UserInterface.h"
 #include "DataMgr\FileMgr.h"
+#include "UserInterface\UserInterface.h"
 
-static LinkList* mainList;
-const char dataFileName[] = "Equipments_Info.txt";
-const char outputFileName[] = "EquipmentsInfo_SortByDate.txt";
+static LinkList* pMainList;
+const char gsDataFileName[] = "Equipments_Info.txt";
+const char gsOutputFileName[] = "EquipmentsInfo_SortByDate.txt";
 
 void System_Initialize(const char* srcFileName);
 void System_Destory();
@@ -15,9 +13,10 @@ void System_Destory();
 
 int main(int atgc, char* argv[])
 {
-	SetConsoleOutputCP(65001);//修改控制台的编码格式为utf-8
-	System_Initialize("data.txt");
-	SetupUI(&mainList);
+	system("chcp 65001");//修改控制台的编码格式为utf-8
+	//SetConsoleOutputCP(65001);
+	System_Initialize(atgc > 1 ? argv[1] : NULL);
+	SetupUI(pMainList);
 	char ctrl = 0;
 	while (true)
 	{
@@ -25,6 +24,7 @@ int main(int atgc, char* argv[])
 		MainMenuDisplay();
 		printf("> 请输入欲执行的操作： ");
 		if (SystemControl(getchar()))	break;
+		UpdateDataFile(pMainList);
 		printf("\n请按任意键继续...");
 		while ((ctrl = getchar()) != '\n' && ctrl != EOF);
 	}
@@ -34,24 +34,31 @@ int main(int atgc, char* argv[])
 
 void System_Initialize(const char* srcFileName)
 {
-	mainList=(LinkList*)calloc(1,sizeof())
-	dataFile = fopen(dataFileName, "r+");
-	assert(dataFile);
+	pMainList = MakeList(NULL, NULL);
 	Equip* equip = NULL;
-	while (equip = MakeEquip() && InputEquip(equip, dataFile))
-		AddEquip(&mainList, equip);
-	if (!srcFileName)	return;
-	FILE* srcFile = fopen(srcFileName, "r");
-	while (equip = MakeEquip() && InputEquip(equip, srcFile))
-		AddEquip(&mainList, equip);
-	UpdateInfoFile(&mainList);
-	fclose(srcFile);
+	FILE* dataFile = NULL;
+	if (!(dataFile = fopen(gsDataFileName, "r")))
+		dataFile = fopen(gsDataFileName, "w");
+	//读取dataFile数据
+	while ((equip = MakeEquip()) && InputEquip(equip, dataFile))
+		AddEquip(pMainList, equip);
+	FreeEquip(&equip);
+	if (srcFileName)
+	{
+		FILE* srcFile = fopen(srcFileName, "r");
+		assert(srcFile);
+		//读取srcFile数据
+		while ((equip = MakeEquip()) && InputEquip(equip, srcFile))
+			AddEquip(pMainList, equip);
+		FreeEquip(&equip);
+		fclose(srcFile);
+	}
 	fclose(dataFile);
+	UpdateDataFile(pMainList);
 }
 
 void System_Destory()
 {
-	fclose(dataFile);
-	fclose(outputFile);
-	FreeList(&mainList);
+	FreeList(&pMainList, true);
+	pMainList = NULL;
 }
