@@ -38,7 +38,7 @@ Equip* MakeEquip(void);
 /**
 * @Function: FreeEquip
 * @Brief:	 销毁释放设备
-* @Param1:	 equip 欲销毁释放的设备
+* @Param1:	 欲销毁释放的设备的二级指针
 * @Return:	 void
 **/
-void FreeEquip(Equip* equip);
+void FreeEquip(Equip** equip);

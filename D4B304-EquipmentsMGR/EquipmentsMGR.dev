@@ -145,7 +145,7 @@ CompileCpp=0
 Folder=UserInterface
 Compile=1
 Link=1
-Priority=1000
+Priority=100
 OverrideBuildCmd=0
 BuildCmd=
 
