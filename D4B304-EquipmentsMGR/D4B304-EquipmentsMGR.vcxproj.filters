@@ -1,19 +1,21 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
     <ClCompile Include="Main.c" />
-    <ClCompile Include="DataMgr\FileMgr.c" />
-    <ClCompile Include="DataMgr\List.c" />
+    <ClCompile Include="EquipMgr\FileMgr.c" />
+    <ClCompile Include="EquipMgr\List.c" />
     <ClCompile Include="EquipMgr\EquipMgr.c" />
     <ClCompile Include="UserInterface\UserInerface.c" />
-    <ClCompile Include="EquipMgr\Equipment.c" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Main.h" />
     <ClInclude Include="EquipMgr\Equipment.h" />
     <ClInclude Include="UserInterface\UserInterface.h" />
     <ClInclude Include="EquipMgr\EquipMgr.h" />
-    <ClInclude Include="DataMgr\FileMgr.h" />
-    <ClInclude Include="DataMgr\List.h" />
+    <ClInclude Include="EquipMgr\FileMgr.h" />
+    <ClInclude Include="EquipMgr\List.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="EquipmentsMGR.dev" />
   </ItemGroup>
 </Project>
