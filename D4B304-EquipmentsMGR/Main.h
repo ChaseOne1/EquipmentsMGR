@@ -4,4 +4,4 @@
 #include <string.h>
 #include <assert.h>
 #include "EquipMgr\Equipment.h"
-#include "EquipMgr\List.h"
+#include "DataMgr\List.h"
