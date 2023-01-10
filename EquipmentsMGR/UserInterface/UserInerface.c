@@ -130,10 +130,10 @@ static void Input()
 	do
 	{
 		printf("> ");
-		char ch;
-		while ((ch = getchar()) == '\n');
-		if (ch == 'N' || ch == 'n')		break;//退出
-		ungetc(ch, stdin);
+		char ctrl;
+		while ((ctrl = getchar()) == '\n');
+		if (ctrl == 'N' || ctrl == 'n')		break;//退出
+		ungetc(ctrl, stdin);
 		Equip* equip = MakeEquip();
 		assert(equip);
 		if (InputEquip(equip, stdin))
@@ -143,6 +143,7 @@ static void Input()
 				printf("已更新！\n");
 		else
 		{
+			while ((ctrl = getchar()) != '\n' && ctrl != EOF);//清空错误的缓冲区
 			printf("输入中出现错误，请重试！\n");
 			FreeEquip(&equip);
 		}
