@@ -72,20 +72,6 @@ bool SystemControl(char ctrl)
 	return false;
 }
 
-Node* PrintInfo(Equip** data, void* pData)
-{
-	Equip* equip = *data;
-	printf("%-8s\t", cEquipType[equip->type]);
-	printf("%-8s\t", equip->name);
-	printf("%-8s\t", equip->id);
-	printf("%-10lld\t", equip->buy_date);
-	printf("%-8lld\t", equip->scrap_date);
-	printf("%.3lf\t", equip->price);
-	putchar('\n');
-	putchar('\n');
-	return data;
-}
-
 eEquipType StrToType(const char* type)
 {
 	for (int i = 0; i < TOTAL; ++i)
@@ -164,7 +150,7 @@ static void Deletee()
 		{
 			printf("请确认删除对象：(Y/N)\n\n");
 			printf("设备种类\t设备名称\t设备编号\t购入日期\t销毁日期\t购入价格\n");
-			PrintInfo(&result->pEquip, NULL);
+			AppendInfoToStream(&result->pEquip, stdout);
 			printf("> ");
 			char ch = 0;
 			while ((ch = getchar()) == '\n');
@@ -218,7 +204,7 @@ static void Scrap()
 		{
 			printf("请确认报废对象：(Y/N)\n\n");
 			printf("设备种类\t设备名称\t设备编号\t购入日期\t销毁日期\t购入价格\n");
-			PrintInfo(result, NULL);
+			AppendInfoToStream(result, stdout);
 			char ch = 0;
 			while ((ch = getchar()) == '\n');
 			if (ch == 'Y' || ch == 'y')
@@ -261,7 +247,7 @@ static void Search()
 	else
 		return;
 	printf("\n设备种类\t设备名称\t设备编号\t购入日期\t销毁日期\t购入价格\n");
-	ListForAllNodeV(resultList, PrintInfo, NULL);
+	ListForAllNodeV(resultList, AppendInfoToStream, stdout);
 	FreeList(&resultList, false);
 	resultList = NULL;
 }
@@ -276,7 +262,7 @@ static void Sort()
 	FILE* outputFile = fopen(gsOutputFileName, "w");
 	Equip** dateList = Date_sort(pEquipList);
 	for (int i = 0; i < pEquipList->LinkNum; ++i)
-		AppendInfoToFile(&dateList[i], outputFile);//param1 try "dateList++" haha
+		AppendInfoToStream(&dateList[i], outputFile);//param1 try "dateList++" haha
 	fclose(outputFile);
 	printf("结果已输出到文件%s\n", gsOutputFileName);
 }
@@ -284,7 +270,7 @@ static void Sort()
 static void ShowAll()
 {
 	printf("设备种类\t设备名称\t设备编号\t购入日期\t销毁日期\t购入价格\n");
-	ListForAllNodeV(pEquipList, PrintInfo, NULL);
+	ListForAllNodeV(pEquipList, AppendInfoToStream, stdout);
 	printf("已全部显示完毕！\n");
 }
 

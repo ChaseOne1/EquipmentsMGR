@@ -71,11 +71,6 @@ unsigned char* TypeCount(LinkList* list)
 	return TYPE;
 }
 
-static void ID_sort(Equip* equip[])
-{
-
-}
-
 Equip** Date_sort(LinkList* list)
 {
 	Equip** dateList = ListValToArry(list);
