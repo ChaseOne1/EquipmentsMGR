@@ -20,6 +20,6 @@ void UpdateDataFile(LinkList* list)
 	if (lastNum == currNum)	return;
 	FILE* dataFile = fopen(gsDataFileName, "w");
 	assert(dataFile);
-	ListForAllNodeV(list, AppendInfoToFile, dataFile);
+	ListForAllNodeV(list, AppendInfoToStream, dataFile);
 	fclose(dataFile);
 }
