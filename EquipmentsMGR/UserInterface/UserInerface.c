@@ -74,7 +74,7 @@ bool SystemControl(char ctrl)
 
 eEquipType StrToType(const char* type)
 {
-	for (int i = 0; i < TOTAL; ++i)
+	for (int i = 0; i < TOTAL + 1; ++i)
 		if (!strcmp(type, cEquipType[i]))
 			return i;
 	return -1;
@@ -116,7 +116,7 @@ static void Input()
 	do
 	{
 		printf("> ");
-		char ctrl;
+		char ctrl = 0;
 		while ((ctrl = getchar()) == '\n');
 		if (ctrl == 'N' || ctrl == 'n')		break;//退出
 		ungetc(ctrl, stdin);
@@ -156,7 +156,7 @@ static void Deletee()
 			while ((ch = getchar()) == '\n');
 			if (ch == 'Y' || ch == 'y')
 			{
-				FreeNode(pEquipList, &result, true);
+				DeleteEquip(pEquipList, result);
 				printf("已删除！\n");
 			}
 		}
@@ -254,7 +254,7 @@ static void Search()
 
 static void Sort()
 {
-	printf("所有设备信息将会按购入日期升序排序！\n");
+	printf("所有设备信息将会按购入日期升序排序输出到文件%s！\n", gsOutputFileName);
 	printf("是否继续？(Y/N) > ");
 	char ctrl = 0;
 	while ((ctrl = getchar()) == '\n');
@@ -264,6 +264,7 @@ static void Sort()
 	for (int i = 0; i < pEquipList->LinkNum; ++i)
 		AppendInfoToStream(&dateList[i], outputFile);//param1 try "dateList++" haha
 	fclose(outputFile);
+	free(dateList);
 	printf("结果已输出到文件%s\n", gsOutputFileName);
 }
 

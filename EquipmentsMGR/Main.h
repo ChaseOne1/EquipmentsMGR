@@ -5,3 +5,5 @@
 #include <assert.h>
 #include "EquipMgr\Equipment.h"
 #include "DataMgr\List.h"
+
+#define CALLBACK __stdcall

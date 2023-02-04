@@ -30,14 +30,6 @@ bool SystemControl(char ctrl);
 
 
 /**
-* @Function: PrintInfo（回调函数）
-* @Brief:	 输出参数对象的设备信息
-* @Param:	 欲读取的对象(Node* / Equip**)
-* @Return:	 返回值永远为NULL
-**/
-Node* PrintInfo(Equip** data, void* pData);
-
-/**
 * @Function: StrToType
 * @Brief:	 解析字符串对应设备类型
 * @Param1:	 欲解析的字符串

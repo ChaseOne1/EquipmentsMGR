@@ -17,7 +17,7 @@ bool AddEquip(LinkList* list, const Equip* equip)
 	{
 		Node* newNode = MakeNode(equip), * curr = list->head;
 		if (!list->LinkNum)
-			PushFront(list, MakeNode(equip));
+			PushFront(list, newNode);
 		else if (strcmp(equip->id, list->head->pEquip->id) < 0)
 			PushFront(list, newNode);
 		else
@@ -38,6 +38,14 @@ bool AddEquip(LinkList* list, const Equip* equip)
 		}
 	}
 	return INSERT;
+}
+
+bool DeleteEquip(LinkList* list, const Node* node)
+{
+	if (!node || !list)
+		return false;
+	FreeNode(list, &node, true);
+	return true;
 }
 
 unsigned char* TypeCount(LinkList* list)
@@ -73,7 +81,7 @@ unsigned char* TypeCount(LinkList* list)
 
 Equip** Date_sort(LinkList* list)
 {
-	Equip** dateList = ListValToArry(list);
+	Equip** dateList = ListValToArray(list);
 	//Sort
 	for (int i = 0; i < list->LinkNum - 1; ++i)
 	{
@@ -107,7 +115,7 @@ Node* SearchById(LinkList* list, const char* id)
 	return NULL;
 }
 
-Node* Name_cmp(Node* node, void* pData)
+Node* CALLBACK Name_cmp(Node* node, void* pData)
 {
 	if (!strcmp((char*)pData, node->pEquip->name))
 		return node;
@@ -115,7 +123,7 @@ Node* Name_cmp(Node* node, void* pData)
 		return NULL;
 }
 
-Node* IsScarpped_cmp(Node* node, void* pData)
+Node* CALLBACK IsScarpped_cmp(Node* node, void* pData)
 {
 	if (node->pEquip->flag == (bool)pData)
 		return node;

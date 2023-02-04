@@ -2,7 +2,7 @@
 
 Node* MakeNode(Equip* equip)
 {
-	Node* node = (Node*)calloc(1, sizeof(Node));
+	Node* node = (Node*)malloc(sizeof(Node));
 	assert(node);
 	node->pEquip = equip;
 	node->next = NULL;
@@ -54,7 +54,7 @@ LinkList* MakeList(Node* head, Node* tail)
 	if (!(list->head = head))	return list;
 	list->head->next = tail;
 	list->LinkNum++;
-	if ((list->tail = tail) != list->head)
+	if (tail && (list->tail = tail) != list->head)
 		list->LinkNum++;
 	return list;
 }
@@ -154,7 +154,7 @@ void ListForAllNodeV(LinkList* list, NodeCallBack pfCallBack, void* pData)
 	}
 }
 
-Equip** ListValToArry(LinkList* list)
+Equip** ListValToArray(LinkList* list)
 {
 	Equip** equipArry = (Equip**)malloc(sizeof(Equip*) * list->LinkNum);
 	assert(equipArry);

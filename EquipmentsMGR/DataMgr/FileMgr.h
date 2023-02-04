@@ -11,7 +11,7 @@ extern const char gsOutputFileName[];
 * @Param2:	 欲追加到的流指针
 * @Return:	 当前处理的对象
 **/
-Node* AppendInfoToStream(Equip** data, FILE* stream);
+Node* CALLBACK AppendInfoToStream(Equip** data, FILE* stream);
 
 
 /**

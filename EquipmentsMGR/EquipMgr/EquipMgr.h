@@ -16,6 +16,16 @@ bool AddEquip(LinkList* list, const Equip* equip);
 
 
 /**
+* @Function: DeleteEquip
+* @Brief:	 删除参数链表中的参数节点设备，始终保持链表节点按数据的id升序排列
+* @Param1:	 含有欲删除元素的链表
+* @Param2:	 欲删除的设备的节点
+* @Return:	 操作结果 false-删除失败 , true-删除成功
+**/
+bool DeleteEquip(LinkList* list, const Node* node);
+
+
+/**
 * @Function: TypeCount
 * @Brief:	 统计参数链表中的各类设备数量及其状态
 * @Param1:	 欲统计的链表
@@ -62,7 +72,7 @@ Node* SearchById(LinkList* list, const char* id);
 * @Param1:	 用户自定义参数
 * @Return:	 匹配的参数节点
 **/
-Node* Name_cmp(Node* node, void* pData);
+Node* CALLBACK Name_cmp(Node* node, void* pData);
 
 
 /**
@@ -72,4 +82,4 @@ Node* Name_cmp(Node* node, void* pData);
 * @Param1:	 用户自定义参数
 * @Return:	 匹配的参数节点
 **/
-Node* IsScarpped_cmp(Node* node, void* pData);
+Node* CALLBACK IsScarpped_cmp(Node* node, void* pData);

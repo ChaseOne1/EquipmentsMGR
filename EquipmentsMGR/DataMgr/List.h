@@ -1,4 +1,5 @@
 #pragma once
+#define CALLBACK __stdcall
 
 //链表节点
 typedef struct ListNode
@@ -17,7 +18,7 @@ typedef struct NodeList
 
 
 //操作链表的回调函数指针类型
-typedef Node* (*NodeCallBack)(Node* node, void* pData);
+typedef Node* (CALLBACK *NodeCallBack)(Node* node, void* pData);
 
 
 /**
@@ -128,4 +129,4 @@ void ListForAllNodeV(LinkList* list, NodeCallBack pfCallBack, void* pData);
 * @Param1:	 欲操作的链表
 * @Return:	 堆区开辟的新数组
 **/
-Equip** ListValToArry(LinkList* list);
+Equip** ListValToArray(LinkList* list);
